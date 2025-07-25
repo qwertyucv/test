@@ -1,0 +1,28 @@
+name: Benchmark
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+jobs:
+  benchmark:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.workflow_run.head_sha }}
+    
+    - name: Compile optimized
+      run: g++ -std=c++17 -O3 main.cpp -o main
+    
+    - name: Run benchmark
+      run: ./main
+      
+    - name: Save results
+      uses: actions/upload-artifact@v3
+      with:
+        name: results/${{ github.event.workflow_run.head_repository.owner.login }}
+        path: result.json
