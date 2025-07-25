@@ -5,7 +5,7 @@
 #include <fstream>
 #include <sstream>
 
-// Простая структура для генерации JSON
+
 struct Result {
     double generation_time;
     double sorting_time;
@@ -25,21 +25,18 @@ int main() {
     std::vector<double> numbers(N);
     Result result;
     
-    // Генерация чисел
+
     auto start_gen = std::chrono::high_resolution_clock::now();
     for (size_t i = 0; i < N; ++i) {
-        numbers[i] = N - i;  // Обратный порядок
+        numbers[i] = N - i;  
     }
     auto end_gen = std::chrono::high_resolution_clock::now();
     result.generation_time = std::chrono::duration<double, std::milli>(end_gen - start_gen).count();
-    
-    // Сортировка
     auto start_sort = std::chrono::high_resolution_clock::now();
     std::sort(numbers.begin(), numbers.end());
     auto end_sort = std::chrono::high_resolution_clock::now();
     result.sorting_time = std::chrono::duration<double, std::milli>(end_sort - start_sort).count();
-    
-    // Сохранение результатов
+
     std::ofstream out("result.json");
     out << result.to_json();
     out.close();
