@@ -2,31 +2,46 @@ name: Update Leaderboard
 
 on:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '0 0 * * *'  # Every day at midnight UTC
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  update:
+  update-leaderboard:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Download artifacts
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Download all artifacts
       uses: actions/download-artifact@v3
       with:
-        path: results
-        pattern: results/*
+        path: downloaded_artifacts
+        pattern: results-*
         merge-multiple: true
+        
+    - name: Prepare results directory
+      run: |
+        mkdir -p results
+        # Перемещаем артефакты в правильную структуру
+        for file in downloaded_artifacts/*; do
+          if [ -f "$file" ]; then
+            username=${file#downloaded_artifacts/results-}
+            mkdir -p "results/$username"
+            mv "$file" "results/$username/result.json"
+          fi
+        done
+        echo "Results structure:"
+        find results -type f
         
     - name: Generate leaderboard
       run: |
         python3 leaderboard.py
         cat LEADERBOARD.md
         
-    - name: Commit and push
+    - name: Update leaderboard file
       run: |
         git config user.name "github-actions"
         git config user.email "actions@users.noreply.github.com"
