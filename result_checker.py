@@ -12,19 +12,14 @@ def check_results():
             if not content:
                 print("❌ File result.json is empty!")
                 return False
-                
-            # Проверяем базовую структуру JSON
             if "generation_time" not in content or "sorting_time" not in content:
                 print(f"❌ Invalid JSON format: {content}")
                 return False
                 
             data = json.loads(content)
             
-            # Проверяем поля
             assert 'generation_time' in data, "Missing generation_time"
             assert 'sorting_time' in data, "Missing sorting_time"
-            
-            # Проверяем значения
             assert isinstance(data['generation_time'], (int, float)), "Invalid generation_time type"
             assert isinstance(data['sorting_time'], (int, float)), "Invalid sorting_time type"
             assert data['sorting_time'] > 0, "Sorting time must be positive"
